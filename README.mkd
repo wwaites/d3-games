@@ -1,0 +1,3 @@
+Created by [Christopher Manning](http://www.christophermanning.org/)
+
+[Run this gist at bl.ocks.org](http://bl.ocks.org/)
