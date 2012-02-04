@@ -1,3 +1,9 @@
 Created by [Christopher Manning](http://www.christophermanning.org/)
 
+References
+----------
+ * http://en.wikipedia.org/wiki/Voronoi_diagram
+ * https://github.com/mbostock/d3/wiki/Force-Layout
+ * http://en.wikipedia.org/wiki/Delaunay_triangulation
+
 [Run this gist at bl.ocks.org](http://bl.ocks.org/1734663)
