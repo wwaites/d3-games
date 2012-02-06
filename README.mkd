@@ -1,5 +1,10 @@
 Created by [Christopher Manning](http://www.christophermanning.org/)
 
+Summary
+-------
+ * Drag the nodes to interact with the diagram
+ * Use the mousewheel to adjust the charge on the nodes (zoom in/out)
+
 References
 ----------
  * [http://en.wikipedia.org/wiki/Voronoi_diagram](http://en.wikipedia.org/wiki/Voronoi_diagram)
