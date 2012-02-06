@@ -2,6 +2,10 @@ Created by [Christopher Manning](http://www.christophermanning.org/)
 
 Summary
 -------
+Nodes are linked to nodes in neighboring cells. The cell's color is a function of its area.
+
+Controls
+-------
  * Drag the nodes to interact with the diagram
  * Use the mousewheel to adjust the charge on the nodes (zoom in/out)
 
