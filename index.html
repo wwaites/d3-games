@@ -3,21 +3,19 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
     <script type="text/javascript" src="http://mbostock.github.com/d3/d3.min.js"></script>
-    <script type="text/javascript" src="http://mbostock.github.com/d3/d3.geom.js"></script>
+    <script type="text/javascript" src="http://mbostock.github.com/d3/d3.geom.min.js"></script>
     <script type="text/javascript" src="http://mbostock.github.com/d3/d3.layout.min.js"></script>
     <link rel="stylesheet" href="http://mbostock.github.com/d3/ex/colorbrewer.css">
     <style type="text/css">
         circle {
-            stroke: black;
-            stroke-opacity: .5;
-            fill: white;
+            stroke: #EFEDF5;
+            fill: #EFEDF5;
         }
         line {
-            stroke: #999;
+            stroke: #EFEDF5;
             pointer-events: none
         }
         path{
-            fill:white;
             stroke: black
         }
     </style>
@@ -29,22 +27,24 @@
     var w = 960,
         h = 500,
         links = [],
-        voronoiVertices = [];
+        voronoiVertices = [],
+        color = d3.scale.quantize().domain([7000, 10000]).range(d3.range(2, 9));
 
-    var vertices = d3.range(100).map(function(d) {
-        lx = Math.random() * w
-        ly = Math.random() * h
-        return {x: lx, y: ly, index: parseInt(lx + ly)};
-    })
+    var vertices = d3.range(100).map(function(d) { return {x: d.x, y: d.y}; })
+
+    var zoomChargeScale = d3.scale.quantize().domain([0, 100]).range(d3.range(-10000, 1).reverse())
+    var zoom = d3.behavior.zoom()
+            .on("zoom", function(d,i) { force.charge(zoomChargeScale(d3.event.scale)).start() });
 
     var svg = d3.select("#chart")
             .append("svg")
             .attr("width", w)
             .attr("height", h)
             .attr("class", "Purples")
+            .call(zoom)
 
     var force = self.force = d3.layout.force()
-            .gravity(.01)
+            .charge(-300)
             .size([w, h])
             .on("tick", update);
 
@@ -53,15 +53,14 @@
     svg.selectAll("path")
             .data(d3.geom.voronoi(vertices.map(function(o){return [o.x,  o.y]})))
             .enter().append("path")
-            .attr("class", function(d, i) { return i ? "q" + (i % 9) + "-9" : null; })
-            .attr("d", function(d) { return "M" + d.join("L") + "Z"; });
-
+            .attr("class", function(d, i) { return "q"+color(d3.geom.polygon(d).area())+"-9"; })
+            .attr("d", function(d) { return "M" + d.join("L") + "Z"; })
 
     svg.selectAll("circle")
             .data(vertices)
             .enter().append("circle")
             .call(force.drag)
-            .attr("r", 10);
+            .attr("r", 5)
 
     var link = svg.selectAll("line")
 
@@ -74,9 +73,8 @@
 
         svg.selectAll("path")
                 .data(d3.geom.voronoi(voronoiVertices))
-                .map(function(d) { return "M" + d.join("L") + "Z"; })
-                .filter(function(d) { return this.getAttribute("d") != d; })
-                .attr("d", function(d) { return d; });
+                .attr("class", function(d, i) { return "q"+color(d3.geom.polygon(d).area())+"-9"; })
+                .attr("d", function(d) { return "M" + d.join("L") + "Z"; })
 
         links = []
         d3.geom.delaunay(voronoiVertices).forEach(function(d) {
