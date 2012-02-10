@@ -30,11 +30,18 @@
         voronoiVertices = [],
         color = d3.scale.quantize().domain([7000, 10000]).range(d3.range(2, 9));
 
-    var vertices = d3.range(100).map(function(d) { return {x: d.x, y: d.y}; })
-
-    var zoomChargeScale = d3.scale.quantize().domain([0, 100]).range(d3.range(-10000, 1).reverse())
-    var zoom = d3.behavior.zoom()
-            .on("zoom", function(d,i) { force.charge(zoomChargeScale(d3.event.scale)).start() });
+    var numVertices = 100;
+    var vertices = d3.range(numVertices).map(function(d) { return {x: d.x, y: d.y}; })
+    var prevEventScale = 1;
+    var zoom = d3.behavior.zoom().on("zoom", function(d,i) {
+        if (d3.event.scale > prevEventScale) {
+            vertices.push(function(d) { return {x: d.x, y: d.y}; })
+        } else if (vertices.length > 2) {
+            vertices.pop();
+        }
+        force.nodes(vertices).start()
+        prevEventScale = d3.event.scale;
+    });
 
     var svg = d3.select("#chart")
             .append("svg")
@@ -50,31 +57,31 @@
 
     force.nodes(vertices).start();
 
-    svg.selectAll("path")
-            .data(d3.geom.voronoi(vertices.map(function(o){return [o.x,  o.y]})))
-            .enter().append("path")
-            .attr("class", function(d, i) { return "q"+color(d3.geom.polygon(d).area())+"-9"; })
-            .attr("d", function(d) { return "M" + d.join("L") + "Z"; })
-
-    svg.selectAll("circle")
-            .data(vertices)
-            .enter().append("circle")
-            .call(force.drag)
-            .attr("r", 5)
-
-    var link = svg.selectAll("line")
+    var circle = svg.selectAll("circle");
+    var path = svg.selectAll("path");
+    var link = svg.selectAll("line");
 
     function update(e) {
         voronoiVertices = vertices.map(function(o){return [o.x,  o.y, o]})
 
-        svg.selectAll("circle")
-                .attr("cx", function(d) { return d.x; })
-                .attr("cy", function(d) { return d.y; });
+        path = path.data(d3.geom.voronoi(voronoiVertices))
+        path.enter().insert("path", "path") //group all the path elements first so they have the lowest z-order
+            .attr("class", function(d, i) { return "q"+color(d3.geom.polygon(d).area())+"-9"; })
+            .attr("d", function(d) { return "M" + d.join("L") + "Z"; });
+        path.attr("class", function(d, i) { return "q"+color(d3.geom.polygon(d).area())+"-9"; })
+            .attr("d", function(d) { return "M" + d.join("L") + "Z"; });
+        path.exit().remove();
 
-        svg.selectAll("path")
-                .data(d3.geom.voronoi(voronoiVertices))
-                .attr("class", function(d, i) { return "q"+color(d3.geom.polygon(d).area())+"-9"; })
-                .attr("d", function(d) { return "M" + d.join("L") + "Z"; })
+        circle = circle.data(vertices)
+        circle.enter().append("circle")
+              .call(force.drag)
+              .attr("r", 0)
+              .attr("cx", function(d) { return d.x; })
+              .attr("cy", function(d) { return d.y; })
+              .transition().duration(1000).attr("r", 5);
+        circle.attr("cx", function(d) { return d.x; })
+              .attr("cy", function(d) { return d.y; });
+        circle.exit().transition().attr("r", 0).remove();
 
         links = []
         d3.geom.delaunay(voronoiVertices).forEach(function(d) {
@@ -89,6 +96,7 @@
             .attr("y1", function(d) { return d.source[2].y; })
             .attr("x2", function(d) { return d.target[2].x; })
             .attr("y2", function(d) { return d.target[2].y; })
+
         link.exit().remove()
     }
 

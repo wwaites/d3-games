@@ -6,8 +6,8 @@ Nodes are linked to nodes in neighboring cells. The cell's color is a function o
 
 Controls
 -------
- * Drag the nodes to interact with the diagram
- * Use the mousewheel to adjust the charge on the nodes (zoom in/out)
+ * Drag the nodes to interact with the diagram.
+ * Use the mousewheel to add/remove nodes.
 
 References
 ----------
