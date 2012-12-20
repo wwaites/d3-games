@@ -4,6 +4,8 @@ Summary
 -------
 Nodes are linked to nodes in neighboring cells. The cell's color is a function of its area.
 
+The white lines are the Delaunay triangulation and the purple cells are the Voronoi diagram.
+
 Controls
 -------
  * Drag the nodes to interact with the diagram.
@@ -12,7 +14,7 @@ Controls
 References
 ----------
  * [http://en.wikipedia.org/wiki/Voronoi_diagram](http://en.wikipedia.org/wiki/Voronoi_diagram)
- * [https://github.com/mbostock/d3/wiki/Force-Layout](https://github.com/mbostock/d3/wiki/Force-Layout)
  * [http://en.wikipedia.org/wiki/Delaunay_triangulation](http://en.wikipedia.org/wiki/Delaunay_triangulation)
+ * [https://github.com/mbostock/d3/wiki/Force-Layout](https://github.com/mbostock/d3/wiki/Force-Layout)
 
 [Run this gist at bl.ocks.org](http://bl.ocks.org/1734663)
