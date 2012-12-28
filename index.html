@@ -2,9 +2,50 @@
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
-    <script type="text/javascript" src="http://mbostock.github.com/d3/d3.v2.min.js"></script>
-    <link rel="stylesheet" type="text/css" href="http://polymaps.org/colorbrewer.css">
+    <script src="http://d3js.org/d3.v3.min.js"></script>
     <style type="text/css">
+      .Purples .q0-3{fill:rgb(239,237,245)}
+      .Purples .q1-3{fill:rgb(188,189,220)}
+      .Purples .q2-3{fill:rgb(117,107,177)}
+      .Purples .q0-4{fill:rgb(242,240,247)}
+      .Purples .q1-4{fill:rgb(203,201,226)}
+      .Purples .q2-4{fill:rgb(158,154,200)}
+      .Purples .q3-4{fill:rgb(106,81,163)}
+      .Purples .q0-5{fill:rgb(242,240,247)}
+      .Purples .q1-5{fill:rgb(203,201,226)}
+      .Purples .q2-5{fill:rgb(158,154,200)}
+      .Purples .q3-5{fill:rgb(117,107,177)}
+      .Purples .q4-5{fill:rgb(84,39,143)}
+      .Purples .q0-6{fill:rgb(242,240,247)}
+      .Purples .q1-6{fill:rgb(218,218,235)}
+      .Purples .q2-6{fill:rgb(188,189,220)}
+      .Purples .q3-6{fill:rgb(158,154,200)}
+      .Purples .q4-6{fill:rgb(117,107,177)}
+      .Purples .q5-6{fill:rgb(84,39,143)}
+      .Purples .q0-7{fill:rgb(242,240,247)}
+      .Purples .q1-7{fill:rgb(218,218,235)}
+      .Purples .q2-7{fill:rgb(188,189,220)}
+      .Purples .q3-7{fill:rgb(158,154,200)}
+      .Purples .q4-7{fill:rgb(128,125,186)}
+      .Purples .q5-7{fill:rgb(106,81,163)}
+      .Purples .q6-7{fill:rgb(74,20,134)}
+      .Purples .q0-8{fill:rgb(252,251,253)}
+      .Purples .q1-8{fill:rgb(239,237,245)}
+      .Purples .q2-8{fill:rgb(218,218,235)}
+      .Purples .q3-8{fill:rgb(188,189,220)}
+      .Purples .q4-8{fill:rgb(158,154,200)}
+      .Purples .q5-8{fill:rgb(128,125,186)}
+      .Purples .q6-8{fill:rgb(106,81,163)}
+      .Purples .q7-8{fill:rgb(74,20,134)}
+      .Purples .q0-9{fill:rgb(252,251,253)}
+      .Purples .q1-9{fill:rgb(239,237,245)}
+      .Purples .q2-9{fill:rgb(218,218,235)}
+      .Purples .q3-9{fill:rgb(188,189,220)}
+      .Purples .q4-9{fill:rgb(158,154,200)}
+      .Purples .q5-9{fill:rgb(128,125,186)}
+      .Purples .q6-9{fill:rgb(106,81,163)}
+      .Purples .q7-9{fill:rgb(84,39,143)}
+      .Purples .q8-9{fill:rgb(63,0,125)}
         circle {
             stroke: #EFEDF5;
             fill: #EFEDF5;
@@ -28,7 +69,7 @@
         voronoiVertices = [],
         color = d3.scale.quantize().domain([7000, 10000]).range(d3.range(2, 9));
 
-    var numVertices = 100;
+    var numVertices = 150;
     var vertices = d3.range(numVertices).map(function(d) { return {x: d.x, y: d.y}; })
     var prevEventScale = 1;
     var zoom = d3.behavior.zoom().on("zoom", function(d,i) {
