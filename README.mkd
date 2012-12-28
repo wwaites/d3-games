@@ -1,7 +1,7 @@
 Created by [Christopher Manning](http://www.christophermanning.org/)
 
 Voronoi Diagram with Force Directed Nodes and Delaunay Links
-===========================================================
+------------------------------------------------------------
 
 Summary
 -------
