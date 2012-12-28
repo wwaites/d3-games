@@ -1,5 +1,8 @@
 Created by [Christopher Manning](http://www.christophermanning.org/)
 
+Voronoi Diagram with Force Directed Nodes and Delaunay Links
+===========================================================
+
 Summary
 -------
 Nodes are linked to nodes in neighboring cells. The cell's color is a function of its area.
