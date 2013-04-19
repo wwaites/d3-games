@@ -16,9 +16,9 @@ Controls
 
 References
 ----------
- * [http://en.wikipedia.org/wiki/Voronoi_diagram](http://en.wikipedia.org/wiki/Voronoi_diagram)
- * [http://en.wikipedia.org/wiki/Delaunay_triangulation](http://en.wikipedia.org/wiki/Delaunay_triangulation)
- * [https://github.com/mbostock/d3/wiki/Force-Layout](https://github.com/mbostock/d3/wiki/Force-Layout)
+ * [Voronoi_diagram](http://en.wikipedia.org/wiki/Voronoi_diagram)
+ * [Delaunay_triangulation](http://en.wikipedia.org/wiki/Delaunay_triangulation)
+ * [D3.js Force Layout](https://github.com/mbostock/d3/wiki/Force-Layout)
  * [Colorbrewer](https://github.com/mbostock/d3/wiki/Ordinal-Scales#colorbrewer)
 
 [Run this gist at bl.ocks.org](http://bl.ocks.org/1734663)
