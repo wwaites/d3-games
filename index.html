@@ -75,7 +75,7 @@
     var zoom = d3.behavior.zoom().on("zoom", function(d,i) {
         if (d3.event.scale > prevEventScale) {
             vertices.push(function(d) { return {x: d.x, y: d.y}; })
-        } else if (vertices.length > 2) {
+        } else if (vertices.length > 2 && d3.event.scale != prevEventScale) {
             vertices.pop();
         }
         force.nodes(vertices).start()
@@ -89,7 +89,7 @@
             .attr("class", "Purples")
             .call(zoom)
 
-    var force = self.force = d3.layout.force()
+    var force = d3.layout.force()
             .charge(-300)
             .size([w, h])
             .on("tick", update);
