@@ -4,48 +4,6 @@
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
     <script src="http://d3js.org/d3.v3.min.js"></script>
     <style type="text/css">
-      .Purples .q0-3{fill:rgb(239,237,245)}
-      .Purples .q1-3{fill:rgb(188,189,220)}
-      .Purples .q2-3{fill:rgb(117,107,177)}
-      .Purples .q0-4{fill:rgb(242,240,247)}
-      .Purples .q1-4{fill:rgb(203,201,226)}
-      .Purples .q2-4{fill:rgb(158,154,200)}
-      .Purples .q3-4{fill:rgb(106,81,163)}
-      .Purples .q0-5{fill:rgb(242,240,247)}
-      .Purples .q1-5{fill:rgb(203,201,226)}
-      .Purples .q2-5{fill:rgb(158,154,200)}
-      .Purples .q3-5{fill:rgb(117,107,177)}
-      .Purples .q4-5{fill:rgb(84,39,143)}
-      .Purples .q0-6{fill:rgb(242,240,247)}
-      .Purples .q1-6{fill:rgb(218,218,235)}
-      .Purples .q2-6{fill:rgb(188,189,220)}
-      .Purples .q3-6{fill:rgb(158,154,200)}
-      .Purples .q4-6{fill:rgb(117,107,177)}
-      .Purples .q5-6{fill:rgb(84,39,143)}
-      .Purples .q0-7{fill:rgb(242,240,247)}
-      .Purples .q1-7{fill:rgb(218,218,235)}
-      .Purples .q2-7{fill:rgb(188,189,220)}
-      .Purples .q3-7{fill:rgb(158,154,200)}
-      .Purples .q4-7{fill:rgb(128,125,186)}
-      .Purples .q5-7{fill:rgb(106,81,163)}
-      .Purples .q6-7{fill:rgb(74,20,134)}
-      .Purples .q0-8{fill:rgb(252,251,253)}
-      .Purples .q1-8{fill:rgb(239,237,245)}
-      .Purples .q2-8{fill:rgb(218,218,235)}
-      .Purples .q3-8{fill:rgb(188,189,220)}
-      .Purples .q4-8{fill:rgb(158,154,200)}
-      .Purples .q5-8{fill:rgb(128,125,186)}
-      .Purples .q6-8{fill:rgb(106,81,163)}
-      .Purples .q7-8{fill:rgb(74,20,134)}
-      .Purples .q0-9{fill:rgb(252,251,253)}
-      .Purples .q1-9{fill:rgb(239,237,245)}
-      .Purples .q2-9{fill:rgb(218,218,235)}
-      .Purples .q3-9{fill:rgb(188,189,220)}
-      .Purples .q4-9{fill:rgb(158,154,200)}
-      .Purples .q5-9{fill:rgb(128,125,186)}
-      .Purples .q6-9{fill:rgb(106,81,163)}
-      .Purples .q7-9{fill:rgb(84,39,143)}
-      .Purples .q8-9{fill:rgb(63,0,125)}
         circle {
             stroke: #EFEDF5;
             fill: #EFEDF5;
@@ -70,7 +28,8 @@
         h = 500,
         links = [],
         voronoiVertices = [],
-        color = d3.scale.quantize().domain([7000, 10000]).range(d3.range(2, 9));
+        // https://github.com/mbostock/d3/blob/master/lib/colorbrewer/colorbrewer.js#L105
+        color = d3.scale.quantize().domain([7000, 10000]).range(["#fcfbfd","#efedf5","#dadaeb","#bcbddc","#9e9ac8","#807dba","#6a51a3","#54278f","#3f007d"])
 
     var numVertices = 150;
     var vertices = d3.range(numVertices).map(function(d) { return {x: d.x, y: d.y}; })
@@ -108,18 +67,14 @@
 
         path = path.data(d3.geom.voronoi(voronoiVertices))
         path.enter().insert("path", "path") //group all the path elements first so they have the lowest z-order
-            .attr("class", function(d, i) { return "q"+color(d3.geom.polygon(d).area())+"-9"; })
-            .attr("d", function(d) { return "M" + d.join("L") + "Z"; });
-        path.attr("class", function(d, i) { return "q"+color(d3.geom.polygon(d).area())+"-9"; })
-            .attr("d", function(d) { return "M" + d.join("L") + "Z"; });
+        path.attr("d", function(d) { return "M" + d.join("L") + "Z"; })
+            .transition().duration(150).style("fill", function(d, i) { return color(d3.geom.polygon(d).area()) })
         path.exit().remove();
 
         circle = circle.data(vertices)
         circle.enter().append("circle")
               .call(force.drag)
               .attr("r", 0)
-              .attr("cx", function(d) { return d.x; })
-              .attr("cy", function(d) { return d.y; })
               .transition().duration(1000).attr("r", 5);
         circle.attr("cx", function(d) { return d.x; })
               .attr("cy", function(d) { return d.y; });
