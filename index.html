@@ -63,7 +63,13 @@
 
     function update(e) {
         path = path.data(d3_geom_voronoi(vertices))
-        path.enter().insert("path", "path") //group all the path elements first so they have the lowest z-order
+        path.enter().append("path")
+            // drag node by dragging cell
+            .call(d3.behavior.drag()
+              .on("drag", function(d, i) {
+                  vertices[i] = {x: vertices[i].x + d3.event.dx, y: vertices[i].y + d3.event.dy}
+              })
+            )
             .style("fill", function(d, i) { return color(0) })
         path.attr("d", function(d) { return "M" + d.join("L") + "Z"; })
             .transition().duration(150).style("fill", function(d, i) { return color(d3.geom.polygon(d).area()) })
