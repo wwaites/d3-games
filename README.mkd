@@ -11,7 +11,7 @@ The white lines are the Delaunay triangulation and the purple cells are the Voro
 
 Controls
 -------
- * Drag the nodes or cells to interact with the diagram.
+ * Drag the cells to interact with the diagram.
  * Use the mousewheel to add/remove nodes.
 
 References
