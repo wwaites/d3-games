@@ -25,13 +25,13 @@
 <div id="chart">
 </div>
 <script type="text/javascript">
-    var w = 960,
-        h = 500,
+    var w = window.innerWidth > 960 ? 960 : window.innerWidth,
+        h = window.innerHeight > 500 ? 500 : window.innerHeight,
         links = [],
         // https://github.com/mbostock/d3/blob/master/lib/colorbrewer/colorbrewer.js#L105
         color = d3.scale.quantize().domain([7000, 10000]).range(["#dadaeb","#bcbddc","#9e9ac8","#807dba","#6a51a3","#54278f","#3f007d"])
 
-    var numVertices = 150;
+    var numVertices = (w*h) / 3200;
     var vertices = d3.range(numVertices).map(function(d) { return {x: d.x, y: d.y}; });
     var d3_geom_voronoi = d3.geom.voronoi().x(function(d) { return d.x; }).y(function(d) { return d.y; })
     var prevEventScale = 1;
