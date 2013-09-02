@@ -3,8 +3,6 @@ Created by [Christopher Manning](http://www.christophermanning.org/projects/voro
 Summary
 -------
 
-Voronoi Diagram with Force Directed Nodes and Delaunay Links
-
 Nodes are linked to nodes in neighboring cells. The cell's color is a function of its area.
 
 The white lines are the Delaunay triangulation and the purple cells are the Voronoi diagram.
