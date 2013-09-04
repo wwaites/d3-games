@@ -11,7 +11,7 @@ Controls
  * Drag the cells to interact with the diagram.
  * Use the mousewheel to add/remove nodes.
  * Hold shift while using the mousewheel to change the initialization spiral
- * Press the letter w to toggle the simulation
+ * Press the letter s to toggle the simulation
 
 References
 ----------
