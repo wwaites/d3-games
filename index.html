@@ -26,8 +26,8 @@
 <div id="chart">
 </div>
 <script type="text/javascript">
-    var w = window.innerWidth > 960 ? 960 : window.innerWidth,
-        h = window.innerHeight > 500 ? 500 : window.innerHeight,
+    var w = window.innerWidth > 960 ? 960 : (window.innerWidth || 960),
+        h = window.innerHeight > 500 ? 500 : (window.innerHeight || 500),
         links = [],
         // https://github.com/mbostock/d3/blob/master/lib/colorbrewer/colorbrewer.js#L105
         color = d3.scale.quantize().domain([7000, 10000]).range(["#dadaeb","#bcbddc","#9e9ac8","#807dba","#6a51a3","#54278f","#3f007d"])
