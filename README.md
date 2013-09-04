@@ -2,7 +2,6 @@ Created by [Christopher Manning](http://www.christophermanning.org/projects/voro
 
 Summary
 -------
-
 Nodes are linked to nodes in neighboring cells. The cell's color is a function of its area.
 
 The white lines are the Delaunay triangulation and the purple cells are the Voronoi diagram.
@@ -11,6 +10,8 @@ Controls
 -------
  * Drag the cells to interact with the diagram.
  * Use the mousewheel to add/remove nodes.
+ * Hold shift while using the mousewheel to change the initialization spiral
+ * Press the space bar to toggle the simulation
 
 References
 ----------

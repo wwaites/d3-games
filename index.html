@@ -28,23 +28,64 @@
 <script type="text/javascript">
     var w = window.innerWidth > 960 ? 960 : (window.innerWidth || 960),
         h = window.innerHeight > 500 ? 500 : (window.innerHeight || 500),
+        radius = 5.25,
         links = [],
+        simulate = true,
+        zoomToAdd = true,
         // https://github.com/mbostock/d3/blob/master/lib/colorbrewer/colorbrewer.js#L105
-        color = d3.scale.quantize().domain([7000, 10000]).range(["#dadaeb","#bcbddc","#9e9ac8","#807dba","#6a51a3","#54278f","#3f007d"])
+        color = d3.scale.quantize().domain([10000, 7250]).range(["#dadaeb","#bcbddc","#9e9ac8","#807dba","#6a51a3","#54278f","#3f007d"])
 
-    var numVertices = (w*h) / 3200;
-    var vertices = d3.range(numVertices).map(function(d) { return {x: d.x, y: d.y}; });
+    var numVertices = (w*h) / 3000;
+    var vertices = d3.range(numVertices).map(function(i) {
+        angle = radius * (i+10);
+        return {x: angle*Math.cos(angle)+(w/2), y: angle*Math.sin(angle)+(h/2)};
+    });
     var d3_geom_voronoi = d3.geom.voronoi().x(function(d) { return d.x; }).y(function(d) { return d.y; })
     var prevEventScale = 1;
     var zoom = d3.behavior.zoom().on("zoom", function(d,i) {
-        if (d3.event.scale > prevEventScale) {
-            vertices.push(function(d) { return {x: d.x, y: d.y}; })
-        } else if (vertices.length > 2 && d3.event.scale != prevEventScale) {
-            vertices.pop();
+        if (zoomToAdd){
+          if (d3.event.scale > prevEventScale) {
+              angle = radius * vertices.length;
+              vertices.push({x: angle*Math.cos(angle)+(w/2), y: angle*Math.sin(angle)+(h/2)})
+          } else if (vertices.length > 2 && d3.event.scale != prevEventScale) {
+              vertices.pop();
+          }
+          force.nodes(vertices).start()
+        } else {
+          if (d3.event.scale > prevEventScale) {
+            radius+= .01
+          } else {
+            radius -= .01
+          }
+          vertices.forEach(function(d, i) {
+            angle = radius * (i+10);
+            vertices[i] = {x: angle*Math.cos(angle)+(w/2), y: angle*Math.sin(angle)+(h/2)};
+          });
+          force.nodes(vertices).start()
         }
-        force.nodes(vertices).start()
         prevEventScale = d3.event.scale;
     });
+
+    d3.select(window)
+      .on("keydown", function() {
+        // shift
+        if(d3.event.keyCode == 16) {
+          zoomToAdd = false
+        }
+
+        // spacebar
+        if(d3.event.keyCode == 32) {
+          simulate = !simulate
+          if(simulate) {
+            force.start()
+          } else {
+            force.stop()
+          }
+        }
+      })
+      .on("keyup", function() {
+        zoomToAdd = true
+      })
 
     var svg = d3.select("#chart")
             .append("svg")
@@ -93,6 +134,8 @@
             .attr("y2", function(d) { return d.target.y; })
 
         link.exit().remove()
+
+        if(!simulate) force.stop()
     }
 </script>
 </body>
