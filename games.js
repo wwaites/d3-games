@@ -259,9 +259,9 @@ function eat(d) {
     }
 }
 
+// die with a certain probability
 function die(d) {
     if (Math.random() < 1/fitness(d)) {
-//	console.log("killing", d, fitness(d));
 	vertices = vertices.filter(function (e) { return e.id != d.id; });
 	force.nodes(vertices).start()
     }
@@ -272,6 +272,10 @@ function fitness(d) {
     return 1 / (1 + Math.exp(-30 * j));
 }
 
+
+/**
+ * Window dressing, sliders and stuff
+ */
 force.nodes(vertices).start();
 d3.select("#start").on("click", function () {
     if (simulate) {
