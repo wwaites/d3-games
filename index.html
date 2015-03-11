@@ -29,33 +29,44 @@
   <body>
     <div class="container">
       <div class="row">
-	<div class="span6">
-	  <input id="division" type="range" min="0.01" max="10"
+	<div class="span3">
+	  <input id="division" type="range" min="0.01" max="1"
 		 step="0.01" />
 	</div>
 	<div class="span2">Division Rate</div>
 	<div class="span1" id="divisionLabel"></div>
+	<div class="span2">Cheaters:</div>
+	<div class="span2">
+	  <span id="cheaters"></span>/<span id="cells"></span>
+	</div>
       </div>
+
       <div class="row">
-	<div class="span6">
+	<div class="span3">
 	  <input id="production" type="range" min="0.01" max="10"
 		 step="0.01" />
 	</div>
-	<div class="span2">
-	  Production Rate:
-	</div>
+	<div class="span2">Production Rate:</div>
 	<div class="span1" id="productionLabel"></div>
+	<div class="span2">Neighbourhood:</div>
+	<div class="span2"><span id="nsize"></span></div>
       </div>
+
       <div class="row">
-	<div class="span6">
-	  <input id="mutation" type="range" min="0.01" max="10"
-		 step="0.01" />
+	<div class="span3">
+	  <input id="mutation" type="range" min="0.001" max="1"
+		 step="0.001" />
 	</div>
-	<div class="span2">Mutation Probability</div>
+	<div class="span2">Mutation Probability:</div>
 	<div class="span1" id="mutationLabel"></div>
+	<div class="span2">Fitness:</div>
+	<div class="span2"><span id="fitness"></span></div>
       </div>
+
       <div class="row">
-	<input type="submit" id="start" value="start" />
+	<div class="span1">
+	  <input type="submit" id="start" value="start" />
+	</div>
       </div>
       <div class="row">
 	<div id="chart"></div>
@@ -63,6 +74,7 @@
     </div>
     <script src="d3.v3.min.js"></script>
     <script src="bootstrap.min.js"></script>
-    <script type="text/javascript" src="games.js"></script>
+    <script src="sprintf.js"></script>
+    <script src="games.js"></script>
   </body>
 </html>

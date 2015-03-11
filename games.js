@@ -44,8 +44,12 @@ var vertices = d3.range(numVertices).map(function(i) {
 	id: i,
 	kind: "coop",
 	food: {},
+	x: Math.random()*w,
+	y: Math.random()*h
+/*
 	x: angle*Math.cos(angle)+(w/2), 
 	y: angle*Math.sin(angle)+(h/2)
+*/
     }
 });
 
@@ -187,10 +191,6 @@ function death_timer(d) {
 	
 var production_rate = 1; // unit of food per unit time
 function production_timer(d) {
-    // cheaters do not produce
-    if (d.kind == "cheat")
-	return;
-
     function send_produce_event() {
 	// do nothing if the simulation is paused
 	if (!simulate) return true;
@@ -198,8 +198,11 @@ function production_timer(d) {
 	cell = circle.filter(function (n) { return n.id == d.id });
 	// only send the event if the cell still exists
 	if (cell.size() == 1) {
+	    var amount = production_rate;
+	    if (d.kind == "cheat") // cheaters do not produce but must be counted
+		amount = 0;
 	    neighbours(d, function(n) {
-		send("food", d, n, production_rate);
+		send("food", d, n, amount);
 	    });
 	    // schedule the next division event
 	    d3.timer(send_produce_event, exponential(production_rate) * 1000);
@@ -209,7 +212,7 @@ function production_timer(d) {
     d3.timer(send_produce_event, exponential(production_rate) * 1000);
 }
 
-var mutation_chance = 0.1;
+var mutation_chance = 0.01;
 function divide(d) {
     // possibly mutate
     var kind = d.kind;
@@ -241,12 +244,14 @@ function divide(d) {
 var production_window = 10;
 function eat(d) {
     var now = new Date().getTime()
-    d.food[d3.event.detail.src.id] = now;
+    d.food[d3.event.detail.src.id] = {
+	time: now,
+	amount: d3.event.detail.msg
+    };
 
     // expire old food events
-    var seen = Object.keys(d.food);
-    for (var i=0; i<seen.length; i++) {
-	if (now - d.food[i] > production_rate*production_window*1000) {
+    for (var i in d.food) {
+	if (now - d.food[i].time > production_rate*production_window*1000) {
 	    delete d.food[i];
 	}
     }
@@ -254,7 +259,9 @@ function eat(d) {
     // do cheaters forward the event?
     if (d3.event.detail.rr.length <= 5) {
 	neighbours(d, function(n) {
-	    send("food", d, n, production_rate, d3.event.detail.rr);
+	    d3.event.detail.rr[d.id] = true
+	    send("food", d3.event.detail.src, n, 
+		 production_rate, d3.event.detail.rr);
 	});
     }
 }
@@ -268,8 +275,16 @@ function die(d) {
 }
 
 function fitness(d) {
-    j = Object.keys(d.food).length / production_window;
-    return 1 / (1 + Math.exp(-30 * j));
+//    j = Object.keys(d.food).length / production_window;
+    var n = 0;
+    var j = 0;
+    for(var i in d.food) {
+	j = j + d.food[i].amount;
+	n = n + 1;
+    }
+    if (n == 0)
+	return 1;
+    return 1 / (1 + Math.exp(-30 * (j/n - 1/2)));
 }
 
 
@@ -312,3 +327,41 @@ d3.select("#mutation").on("change", function () {
     this.value = mutation_chance;
     d3.select("#mutationLabel").text(mutation_chance);
 });
+
+function mean(arr) {
+    var m = d3.mean(arr);
+    if (m == undefined)
+	m = 0;
+    return m;
+}
+
+function update_counts() {
+    d3.select("#cells").text(circle.size());
+    d3.select("#cheaters").text(
+	circle
+	    .filter(function (d) { return d.kind == "cheat"; })
+	    .size()
+    );
+    var nsize = [];
+    var coopfit = [];
+    var cheatfit = [];
+    var fits = [];
+    circle.each(function (d) {
+	var fit = fitness(d);
+	if (d.kind == "coop")
+	    coopfit.push(fit);
+	else
+	    cheatfit.push(fit);
+	fits.push(fit);
+	nsize.push(Object.keys(d.food).length);
+    });
+    d3.select("#nsize").text(
+	sprintf("%d/%.02f/%d", d3.min(nsize), mean(nsize), d3.max(nsize))
+    );
+    d3.select("#fitness").text(
+	sprintf("%.02f/%.02f/%.02f", mean(coopfit), mean(cheatfit), mean(fits))
+    );
+    d3.timer(update_counts, 1);
+    return true;
+}
+d3.timer(update_counts, 1);
