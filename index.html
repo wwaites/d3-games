@@ -24,52 +24,67 @@
         stroke: #EFEDF5;
         stroke-width: 4px;
       }
+      #chart {
+        margin-top: 5px;
+        text-align: center;
+      }
     </style>
   </head>
   <body>
     <div class="container">
+      <h1>Game-Theory Cell Evolution Demo</h1>
       <div class="row">
-	<div class="span3">
-	  <input id="division" type="range" min="0.01" max="1"
-		 step="0.01" />
-	</div>
-	<div class="span2">Division Rate</div>
-	<div class="span1" id="divisionLabel"></div>
-	<div class="span2">Cheaters:</div>
-	<div class="span2">
-	  <span id="cheaters"></span>/<span id="cells"></span>
-	</div>
-      </div>
-
-      <div class="row">
-	<div class="span3">
-	  <input id="production" type="range" min="0.01" max="10"
-		 step="0.01" />
-	</div>
-	<div class="span2">Production Rate:</div>
-	<div class="span1" id="productionLabel"></div>
-	<div class="span2">Neighbourhood:</div>
-	<div class="span2"><span id="nsize"></span></div>
-      </div>
-
-      <div class="row">
-	<div class="span3">
+	<div class="span4">
+	  <span>Division Rate</span><br />
+	  <label class="checkbox">
+	    <input id="division" type="range" min="0.01" max="1"
+		   step="0.01" />
+	    <span id="divisionLabel"></span>
+	  </label>
+	  <span>Production Rate:</span>
+	  <label class="checkbox">
+	    <input id="production" type="range" min="0.01" max="10"
+		   step="0.01" />
+	    <span id="productionLabel"></span>
+	  </label>
+	<span>Mutation Probability:</span>
+	<label class="checkbox">
 	  <input id="mutation" type="range" min="0.001" max="1"
 		 step="0.001" />
+	  <span id="mutationLabel"></span>
+	</label>
 	</div>
-	<div class="span2">Mutation Probability:</div>
-	<div class="span1" id="mutationLabel"></div>
-	<div class="span2">Fitness:</div>
-	<div class="span2"><span id="fitness"></span></div>
+	<div class="span4" id="payoff" style="text-align: center;"></div>
+	<div class="span4">
+	  <div class="row">
+	    <span class="span2">Cheaters:</span>
+	    <span class="span2">
+	      <span id="cheaters"></span>/<span id="cells"></span>
+	    </span>
+	  </div>
+	  <div class="row">
+	    <span class="span2">Neighbourhood:</span>
+	    <span class="span2" id="neighbourhood"></span>
+	  </div>
+	  <div class="row">
+	    <span class="span2">Fitness:</span>
+	    <span class="span2" id="fitness"></span>
+	  </div>
+	  <div class="row">
+	    <span class="span2">Nutrition:</span>
+	    <span class="span2" id="food"></span>
+	  </div>
+	</div>
       </div>
 
       <div class="row">
-	<div class="span1">
-	  <input type="submit" id="start" value="start" />
+	<div class="span4"></div>
+	<div class="span4" style="text-align: center;">
+	  <input type="submit" id="start" value="start" class="btn" />
 	</div>
       </div>
       <div class="row">
-	<div id="chart"></div>
+	<span class="span12" id="chart"></span>
       </div>
     </div>
     <script src="d3.v3.min.js"></script>
