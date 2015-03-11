@@ -69,8 +69,8 @@ function update(e) {
              )
         .style("fill", function(d, i) { return "#00ffff" })
     path.attr("d", function(d) { return "M" + d.join("L") + "Z"; })
-        .transition()
-	.duration(150)
+//        .transition()
+//	.duration(150)
 	.style("fill", function(d, i) { return colours[d.point.kind]; })
 	.style("stroke-width", 1);
     path.exit().remove();
