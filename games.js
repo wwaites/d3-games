@@ -1,6 +1,6 @@
 var w = window.innerWidth > 960 ? 960 : (window.innerWidth || 960),
     h = window.innerHeight > 500 ? 500 : (window.innerHeight || 500),
-    radius = 5.25,
+    initPopulation = 300,
     links = [],
     simulate = false;
 
@@ -32,26 +32,30 @@ var svg = d3.select("#chart")
     .attr("height", h);
 
 var force = d3.layout.force()
-    .charge(-30)
+    .charge(-300)
     .friction(0.1)
     .size([w, h])
     .on("tick", update);
 
-var numVertices = 300;
-var vertices = d3.range(numVertices).map(function(i) {
-    angle = radius * (i+10);
-    return {
-	id: i,
-	kind: "coop",
-	food: {},
-	x: Math.random()*w,
-	y: Math.random()*h
-/*
-	x: angle*Math.cos(angle)+(w/2), 
-	y: angle*Math.sin(angle)+(h/2)
-*/
-    }
-});
+var numVertices = initPopulation;
+
+function newPopulation(n) {
+    return d3.range(n).map(function(i) {
+	return {
+	    id: i,
+	    kind: "coop",
+	    food: {},
+	    x: Math.random()*w,
+	    y: Math.random()*h
+	}
+    });
+}
+var vertices = newPopulation(initPopulation);
+
+function resetPopulation(n) {
+    vertices = newPopulation(n);
+    numVertices = vertices.length;
+}
 
 var circle = svg.selectAll("circle");
 var path = svg.selectAll("path");

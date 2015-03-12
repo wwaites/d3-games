@@ -15,6 +15,13 @@ d3.select("#start").on("click", function () {
     simulate = !simulate;
 });
 
+d3.select("#reset").on("click", function () {
+    var n = d3.select("#population").node().value;
+    console.log(n);
+    resetPopulation(n);
+    force.nodes(vertices).start();
+});
+
 d3.select("#division").on("change", function () {
     division_rate = this.value;
     d3.select("#divisionLabel").text(division_rate);
