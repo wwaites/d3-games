@@ -12,6 +12,9 @@ d3.select("#start").on("click", function () {
 	sim.pause();
 	this.value = "resume";
     } else {
+        if (sim.population.length == 0) {
+            sim.resetPopulation();
+        }
 	sim.resume();
 	this.value = "pause";
     }
