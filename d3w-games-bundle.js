@@ -24,7 +24,7 @@ function exponential(rate) {
     return -1 * Math.log(Math.random()) / rate;
 }
 
-var division_rate = 0.1;
+var division_rate = 0.16;
 d3.select("#division").on("change", function () {
     division_rate = this.value;
     d3.select("#divisionLabel").text(division_rate);
@@ -69,7 +69,7 @@ d3.select("#mutation").on("change", function () {
     sim.mutation(function () { return mutation_rate; });
 });
 
-var bias = 0.1;
+var bias = 0.2;
 d3.select("#bias").on("change", function () {
     bias = this.value;
     d3.select("#biasLabel").text(bias);
