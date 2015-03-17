@@ -1,9 +1,13 @@
 var Cell = require("cell");
 var Sim = require("sim");
+var plots = require("plots");
 
 global.sim = new Sim(Cell, "#chart");
 
 sim.popSize = function () { return 300; }
+
+var update_count_plot = plots.setup_count_plot(sim);
+var update_benefit_plot = plots.setup_benefit_plot(sim);
 
 d3.select("#start").on("click", function () {
     if (sim.running) {
@@ -12,6 +16,7 @@ d3.select("#start").on("click", function () {
     } else {
         if (sim.population.length == 0) {
             sim.resetPopulation();
+	    setTimeout(update_benefit_plot, 1000, sim);
         }
 	sim.resume();
 	this.value = "pause";
@@ -71,11 +76,34 @@ var bias = 0.2;
 d3.select("#bias").on("change", function () {
     bias = this.value;
     d3.select("#biasLabel").text(bias);
-    Cell.prototype.bias.call(Cell, function () { return bias; });
+    Cell.prototype.bias = function () { return bias; };
 }).each(function () {
     this.value = bias;
     d3.select("#biasLabel").text(bias);
-    Cell.prototype.bias.call(Cell, function () { return bias; });
+    Cell.prototype.bias = function () { return bias; };
+});
+
+var cost = 1;
+d3.select("#cost").on("change", function () {
+    cost = this.value;
+    d3.select("#costLabel").text(cost);
+    Cell.prototype.cost = function () { return cost; };
+}).each(function () {
+    this.value = cost;
+    d3.select("#costLabel").text(cost);
+    Cell.prototype.cost = function () { return cost; };
+});
+
+var sigma = -30;
+d3.select("#sigma").on("change", function () {
+    sigma = this.value;
+    d3.select("#sigmaLabel").text(sigma);
+    Cell.prototype.sigma = function () { return sigma; };
+    update_benefit_plot(sim);
+}).each(function () {
+    this.value = sigma;
+    d3.select("#sigmaLabel").text(sigma);
+    Cell.prototype.sigma = function () { return sigma; };
 });
 
 var charge = 250;
@@ -100,87 +128,6 @@ d3.select("#friction").on("change", function () {
     sim.friction(friction);
 });
 
-function setup_count_plot(sim) {
-    var m = [0, 10, 25, 10];
-    var w = 250 - m[1] - m[3];
-    var h = 150 - m[0] - m[2];
-    var xscale = d3.scale.linear().range([0, w]);
-    var yscale = d3.scale.linear().range([h, 0]);
-
-    var line = d3.svg.line()
-	.x(function (d) { return xscale(d.x); })
-	.y(function (d) { return yscale(d.y); })
-	.interpolate("basis");
-
-    var plot = d3.select("#plots")
-	.append("svg")
-	.attr("width", w + m[1] + m[3])
-	.attr("height", h + m[0] + m[2])
-	.append("svg:g");
-
-    plot.attr("transform", "translate(" + m[3] + "," + m[0] + ")");
-
-    var xaxis = d3.svg.axis().scale(xscale).ticks(0);
-    plot.append("svg:g")
-	.style("stroke", "#000")
-	.style("fill", "none")
-	.attr("transform", "translate(0," + h + ")")
-	.call(xaxis);
-
-    var cheaters = plot.append("path")
-	.style("stroke", sim.colours["cheat"])
-	.style("stroke-width", 1)
-	.style("fill", "none");
-
-    var cooperators = plot.append("path")
-	.style("stroke", sim.colours["coop"])
-	.style("stroke-width", 1)
-	.style("fill", "none");
-
-    var total = plot.append("path")
-	.style("stroke", "blue")
-	.style("stroke-width", 1)
-	.style("fill", "none");
-
-    var counts = [];
-
-    var update_counts = function(sim, now) {
-	var coop = 0;
-	var cheat = 0;
-	var total = sim.population.length;
-	for (var i=0; i<sim.population.length; i++) {
-	    if(sim.population[i].kind == "coop") coop += 1;
-	    else cheat += 1;
-	}
-	counts.push({
-	    time: now, 
-	    coop: coop,
-	    cheat: cheat,
-	    total: total
-	});
-    }
-
-    update_counts(sim, 0);
-
-    var update = function (sim, now) {
-	update_counts(sim, now);
-	xscale.domain([0, now]);
-	yscale.domain([0, d3.max(counts.map(function (c) { return c.total; }))]);
-	cheaters.attr("d", line(counts.map(function (c) {
-	    return { x: c.time, y: c.cheat };
-	})));
-	cooperators.attr("d", line(counts.map(function (c) {
-	    return { x: c.time, y: c.coop };
-	})));
-	total.attr("d", line(counts.map(function (c) {
-	    return { x: c.time, y: c.total };
-	})));
-    }
-
-    return update;
-}
-
-var update_count_plot = setup_count_plot(sim);
 var start = new Date().getTime();				  
 
 sim.on("step", function () {
