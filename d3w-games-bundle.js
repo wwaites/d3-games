@@ -10043,7 +10043,7 @@ function setup_benefit_plot(sim) {
 	.call(xaxis);
 
     var benefit = plot.append("path")
-	.style("stroke", "#34cd67")
+	.style("stroke", "steelblue")
 	.style("stroke-width", 1)
 	.style("fill", "none");
 
