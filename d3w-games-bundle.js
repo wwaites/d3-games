@@ -101,7 +101,7 @@ d3.select("#bias").on("change", function () {
     Cell.prototype.bias = function () { return bias; };
 });
 
-var cost = 1;
+var cost = 0.1;
 d3.select("#cost").on("change", function () {
     cost = this.value;
     d3.select("#costLabel").text(cost);
@@ -254,7 +254,7 @@ Cell.prototype.stats = function () {
  * Parameters relating to cost, benefit, payoff and so forth
  **/
 Cell.prototype.sigma = function () { return -30; }
-Cell.prototype.cost  = function () { return 1; }
+Cell.prototype.cost  = function () { return 0.1; }
 Cell.prototype.bias  = function () { return 0.1; }
 
 /**

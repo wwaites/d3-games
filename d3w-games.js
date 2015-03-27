@@ -99,7 +99,7 @@ d3.select("#bias").on("change", function () {
     Cell.prototype.bias = function () { return bias; };
 });
 
-var cost = 1;
+var cost = 0.1;
 d3.select("#cost").on("change", function () {
     cost = this.value;
     d3.select("#costLabel").text(cost);
