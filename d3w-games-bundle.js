@@ -10109,7 +10109,7 @@ function setup_fitness_plot(sim) {
 	var coop_data = d3.layout.histogram().bins(20).range([0, max_fit])(coop_fits);
 	var cheat_data = d3.layout.histogram().bins(20).range([0, max_fit])(cheat_fits);
 	
-	yscale = yscale.domain([0, d3.max(all_data, function (d) { return d.y; })]);
+	yscale = yscale.domain([0, sim.population.length]);
 
 	var dx = xscale(d3.max(all_data, function(d) { return d.dx/3; }));
 
@@ -10265,7 +10265,7 @@ Sim.prototype.eat = function(cell, amount, path) {
 
     var now = new Date().getTime();
 
-    var window = 10 * cell.production();
+    var window = 2 * cell.production();
     // expire old food
     for (var i in cell.food) {
 	if (now - cell.food[i].time > window) {
