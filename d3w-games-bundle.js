@@ -6,6 +6,10 @@ var plots = require("plots");
 
 global.sim = new Sim(Cell, "#chart");
 
+var update_count_plot = plots.setup_count_plot(sim);
+var update_benefit_plot = plots.setup_benefit_plot(sim);
+var update_fitness_plot = plots.setup_fitness_plot(sim);
+
 sim.popSize = function () {
     return d3.select("#population").attr("value");
 }
@@ -16,9 +20,6 @@ d3.select("#population").on("change", function () {
 	return v;
     };
 });
-
-var update_count_plot = plots.setup_count_plot(sim);
-var update_benefit_plot = plots.setup_benefit_plot(sim);
 
 d3.select("#start").on("click", function () {
     if (sim.running) {
@@ -151,6 +152,8 @@ var start = new Date().getTime();
 sim.on("step", function () {
     var now = new Date().getTime();
     update_count_plot(this, now - start);
+    update_fitness_plot(this);
+
     var stats = sim.population.map(function (c) { return c.stats(); });
     var degree = d3.mean(sim.population.map(function (c) { 
 	return c.neighbours().length; 
@@ -9963,10 +9966,10 @@ function setup_count_plot(sim) {
     d3.select("#counts_c").style("color", sim.colours["coop"]);
 
     var total = plot.append("path")
-	.style("stroke", "blue")
+	.style("stroke", "steelblue")
 	.style("stroke-width", 1)
 	.style("fill", "none");
-    d3.select("#counts_t").style("color", "blue");
+    d3.select("#counts_t").style("color", "steelblue");
 
     var counts = [];
     var last_count;
@@ -10046,7 +10049,7 @@ function setup_benefit_plot(sim) {
 
     d3.select("#counts_nd").style("color", sim.colours["cheat"]);
     d3.select("#counts_nc").style("color", sim.colours["coop"]);
-    d3.select("#counts_nh").style("color", "blue");
+    d3.select("#counts_nh").style("color", "steelblue");
 
     var update = function(sim) {
 	var data = d3.range(0, 50, 1).map(function (x) {
@@ -10064,8 +10067,138 @@ function setup_benefit_plot(sim) {
     return update;
 }
 
+function setup_fitness_plot(sim) {
+    var d3 = sim.d3;
+    var m = [0, 10, 25, 10];
+    var w = 250 - m[1] - m[3];
+    var h = 150 - m[0] - m[2];
+
+    var xscale = d3.scale.linear().domain([0, 1]).range([0, w]);
+    var yscale = d3.scale.linear().domain([0, 1]).range([h, 0]);
+    var xaxis = d3.svg.axis().scale(xscale).orient("bottom");
+
+    // XXX
+    sim.xscale=xscale;
+    sim.yscale=yscale;
+		      
+    var plot = d3.select("#fitness")
+	.append("svg")
+	.attr("width", w + m[1] + m[3])
+	.attr("height", h + m[0] + m[2])
+	.append("g");
+    plot.attr("transform", "translate(" + m[3] + "," + m[0] + ")");
+
+
+    // Generate a histogram using twenty uniformly-spaced bins.
+/*
+    var data = d3.layout.histogram()
+	.bins(x.ticks(20))(values);
+
+    var bar = svg.selectAll(".bar")
+	.data(data)
+	.enter().append("g")
+	.attr("class", "bar")
+	.attr("transform", function(d) {
+	    return "translate(" + x(d.x) + "," + y(d.y) + ")";
+	});
+
+    bar.append("rect")
+	.attr("x", 1)
+	.attr("width", xscale(data[0].dx) - 1)
+	.attr("height", function(d) { return height - y(d.y); });
+*/        
+//    bar.append("text")
+//	.attr("dy", ".75em")
+//	.attr("y", 6)
+//	.attr("x", xscale(data[0].dx) / 2)
+//	.attr("text-anchor", "middle")
+//	.text(function(d) { return formatCount(d.y); });
+
+    var xaxis = d3.svg.axis().scale(xscale).ticks(5);
+    plot.append("g")
+	.style("stroke", "#000")
+	.style("fill", "none")
+	.attr("transform", "translate(0," + h + ")")
+	.call(xaxis);
+//	.attr("transform", "translate(0," + height + ")")
+//	.call(xaxis);
+
+    function update(sim) {
+	var fits = sim.population.map(function (c) {
+	    return { cell: c, fitness: c.fitness() / (1 + c.bias()) };
+	});
+	var all_fits = fits.map(function (f) { return f.fitness; });
+	var coop_fits = fits
+	    .filter(function (f) { return f.cell.kind == "coop"; })
+	    .map(function (f) { return f.fitness; });
+	var cheat_fits = fits
+	    .filter(function(f) { return f.cell.kind == "cheat"; })
+	    .map(function(f) { return f.fitness; });
+
+	var max_fit = 1;
+	var all_data = d3.layout.histogram().bins(20).range([0, max_fit])(all_fits);
+	var coop_data = d3.layout.histogram().bins(20).range([0, max_fit])(coop_fits);
+	var cheat_data = d3.layout.histogram().bins(20).range([0, max_fit])(cheat_fits);
+	
+	yscale = yscale.domain([0, d3.max(all_data, function (d) { return d.y; })]);
+
+	sim.fits = fits; // XXX
+	sim.xscale = xscale;
+	sim.yscale = yscale; // XXX 
+	sim.all_fits = all_fits; // XXX
+	sim.all_data = all_data; // XXX
+
+	var dx = xscale(d3.max(all_data, function(d) { return d.dx/3; }));
+
+	plot.selectAll(".coop_fitness").remove();
+	var coop_bar = plot.selectAll(".coop_fitness").data(coop_data);
+	coop_bar.enter().append("g")
+	    .attr("class", "coop_fitness")
+	    .attr("transform", function(d) {
+		return "translate(" + (xscale(d.x) - 1.5*dx) + "," + yscale(d.y) + ")";
+	    })
+	    .append("rect")
+	    .attr("x", 1)
+	    .attr("width", dx)
+	    .attr("height", function(d) { return h - yscale(d.y); })
+	    .style("fill", sim.colours["coop"])
+	    .style("shape-rendering", "crispEdges");
+
+	plot.selectAll(".cheat_fitness").remove();
+	var cheat_bar = plot.selectAll(".cheat_fitness").data(cheat_data);
+	cheat_bar.enter().append("g")
+	    .attr("class", "cheat_fitness")
+	    .attr("transform", function(d) {
+		return "translate(" + (xscale(d.x) - 0.5*dx) + "," + yscale(d.y) + ")";
+	    })
+	    .append("rect")
+	    .attr("x", 1)
+	    .attr("width", dx)
+	    .attr("height", function(d) { return h - yscale(d.y); })
+	    .style("fill", sim.colours["cheat"])
+	    .style("shape-rendering", "crispEdges");
+
+	plot.selectAll(".all_fitness").remove();
+	var all_bar = plot.selectAll(".all_fitness").data(all_data);
+	all_bar.enter().append("g")
+	    .attr("class", "all_fitness")
+	    .attr("transform", function(d) {
+		return "translate(" + (xscale(d.x) + 0.5*dx) + "," + yscale(d.y) + ")";
+	    })
+	    .append("rect")
+	    .attr("x", 1)
+	    .attr("width", dx)
+	    .attr("height", function(d) { return h - yscale(d.y); })
+	    .style("fill", "steelblue")
+	    .style("shape-rendering", "crispEdges");
+
+    }
+    return update;
+}
+
 module.exports.setup_count_plot = setup_count_plot
 module.exports.setup_benefit_plot = setup_benefit_plot
+module.exports.setup_fitness_plot = setup_fitness_plot
 
 // Local Variables:
 // compile-command: "make -C .."

@@ -4,6 +4,10 @@ var plots = require("plots");
 
 global.sim = new Sim(Cell, "#chart");
 
+var update_count_plot = plots.setup_count_plot(sim);
+var update_benefit_plot = plots.setup_benefit_plot(sim);
+var update_fitness_plot = plots.setup_fitness_plot(sim);
+
 sim.popSize = function () {
     return d3.select("#population").attr("value");
 }
@@ -14,9 +18,6 @@ d3.select("#population").on("change", function () {
 	return v;
     };
 });
-
-var update_count_plot = plots.setup_count_plot(sim);
-var update_benefit_plot = plots.setup_benefit_plot(sim);
 
 d3.select("#start").on("click", function () {
     if (sim.running) {
@@ -149,6 +150,8 @@ var start = new Date().getTime();
 sim.on("step", function () {
     var now = new Date().getTime();
     update_count_plot(this, now - start);
+    update_fitness_plot(this);
+
     var stats = sim.population.map(function (c) { return c.stats(); });
     var degree = d3.mean(sim.population.map(function (c) { 
 	return c.neighbours().length; 
