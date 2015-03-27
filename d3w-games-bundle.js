@@ -6,7 +6,16 @@ var plots = require("plots");
 
 global.sim = new Sim(Cell, "#chart");
 
-sim.popSize = function () { return 300; }
+sim.popSize = function () {
+    return d3.select("#population").attr("value");
+}
+
+d3.select("#population").on("change", function () {
+    var v = this.value;
+    sim.popSize = function () {
+	return v;
+    };
+});
 
 var update_count_plot = plots.setup_count_plot(sim);
 var update_benefit_plot = plots.setup_benefit_plot(sim);
@@ -14,15 +23,21 @@ var update_benefit_plot = plots.setup_benefit_plot(sim);
 d3.select("#start").on("click", function () {
     if (sim.running) {
 	sim.pause();
-	this.value = "resume";
+	d3.select(this).text("resume");
     } else {
         if (sim.population.length == 0) {
             sim.resetPopulation();
-	    setTimeout(update_benefit_plot, 1000, sim);
         }
 	sim.resume();
-	this.value = "pause";
+	d3.select(this).text("pause");
     }
+});
+
+d3.select("#reset").on("click", function () {
+    var wasrunning = sim.running;
+    if (wasrunning) sim.pause();
+    sim.resetPopulation();
+    if (wasrunning) sim.resume();
 });
 
 function exponential(rate) {
@@ -106,6 +121,7 @@ d3.select("#sigma").on("change", function () {
     this.value = sigma;
     d3.select("#sigmaLabel").text(sigma);
     Cell.prototype.sigma = function () { return sigma; };
+    update_benefit_plot(sim);
 });
 
 var charge = 250;
@@ -135,6 +151,19 @@ var start = new Date().getTime();
 sim.on("step", function () {
     var now = new Date().getTime();
     update_count_plot(this, now - start);
+    var stats = sim.population.map(function (c) { return c.stats(); });
+    var degree = d3.mean(sim.population.map(function (c) { 
+	return c.neighbours().length; 
+    }));
+    var neighbourhood = d3.mean(stats.map(function (s) { return s.neighbours; }));
+    var coop = d3.mean(stats.map(function (s) { return s.cooperators; }));
+    var cheat = d3.mean(stats.map(function (s) {
+	return s.neighbours - s.cooperators;
+    }));
+    d3.select("#counts_n").text(Math.round(degree*100)/100);
+    d3.select("#counts_nc").text(Math.round(coop*100)/100);
+    d3.select("#counts_nd").text(Math.round(cheat*100)/100);
+    d3.select("#counts_nh").text(Math.round(neighbourhood*100)/100);
 });
 
 //sim.start();
@@ -172,7 +201,6 @@ function Cell(kind) {
     // received.
     this.food  = {};
 
-    this.start_timers();
     events.EventEmitter.call(this);
 }
 
@@ -9938,7 +9966,7 @@ function setup_count_plot(sim) {
 	.style("stroke", "blue")
 	.style("stroke-width", 1)
 	.style("fill", "none");
-    d3.select("#counts_n").style("color", "blue");
+    d3.select("#counts_t").style("color", "blue");
 
     var counts = [];
     var last_count;
@@ -9977,7 +10005,7 @@ function setup_count_plot(sim) {
 	})));
 	d3.select("#counts_c").text(last_count.coop);
 	d3.select("#counts_d").text(last_count.cheat);
-	d3.select("#counts_n").text(last_count.total);
+	d3.select("#counts_t").text(last_count.total);
     }
 
     return update;
@@ -9988,7 +10016,7 @@ function setup_benefit_plot(sim) {
     var m = [0, 10, 25, 10];
     var w = 250 - m[1] - m[3];
     var h = 150 - m[0] - m[2];
-    var xscale = d3.scale.linear().domain([0, 1]).range([0, w]);
+    var xscale = d3.scale.linear().domain([0, 50]).range([0, w]);
     var yscale = d3.scale.linear().domain([0, 1]).range([h, 0]);
 
     var line = d3.svg.line()
@@ -10004,7 +10032,7 @@ function setup_benefit_plot(sim) {
 
     plot.attr("transform", "translate(" + m[3] + "," + m[0] + ")");
 
-    var xaxis = d3.svg.axis().scale(xscale).ticks(0);
+    var xaxis = d3.svg.axis().scale(xscale).ticks(5);
     plot.append("svg:g")
 	.style("stroke", "#000")
 	.style("fill", "none")
@@ -10016,18 +10044,17 @@ function setup_benefit_plot(sim) {
 	.style("stroke-width", 1)
 	.style("fill", "none");
 
+    d3.select("#counts_nd").style("color", sim.colours["cheat"]);
+    d3.select("#counts_nc").style("color", sim.colours["coop"]);
+    d3.select("#counts_nh").style("color", "blue");
+
     var update = function(sim) {
-	var max_benefit = 0;
-	var stats = 
-	    sim.population.map(function (c) { return c.stats(); });
-	var neighbours = 
-	    d3.mean(stats.map(function (s) { return s.neighbours; }));
-	var data = d3.range(0, 1, 0.05).map(function (x) {
+	var data = d3.range(0, 50, 1).map(function (x) {
 	    return {
 		x: x,
 		y: Cell.prototype.benefit({
-		    neighbours: neighbours,
-		    cooperators: x * neighbours
+		    neighbours: 50,
+		    cooperators: x
 		})
 	    }
 	});
@@ -10119,25 +10146,30 @@ Sim.prototype.divide = function(cell) {
 
     // add to the list of cells and redo the layout
     this.population.push(child);
+    child.start_timers();
     this.force.nodes(this.population).start()
 }
 
 Sim.prototype.eat = function(cell, amount, path) {
-//    console.log("eat", cell.id, amount, path);
-    if (path.length > 5) return;
+    // if the food has travelled too far, it is probably
+    // stale and mouldy and we don't want to eat it.
+    if (path.length > 5) {
+	return;
+    }
 
-//    console.log(this, path);
-    // check if we've seen this food before
+    // have we seen this food before? boring.
     for (var i=0; i<path.length; i++) {
 	if (path[i] == cell.id)
 	    return;
     }
-    // add ourselves to the record route for loop detection
+
+    // add ourselves to the path because we don't want to
+    // chew the same food twice
     path.push(cell.id);
 
     var now = new Date().getTime();
 
-    var window = 2 * cell.production();
+    var window = 10 * cell.production();
     // expire old food
     for (var i in cell.food) {
 	if (now - cell.food[i].time > window) {
@@ -10213,17 +10245,14 @@ Sim.prototype.start = function() {
 
 Sim.prototype.pause = function() {
     this.running = false;
-    for (var i=0; i<this.population.size; i++) {
+    this.stop_timers();
+    for (var i=0; i<this.population.length; i++) {
 	var cell = this.population[i];
 	cell.stop_timers();
     }
-    this.stop_timers();
 }
 
 Sim.prototype.resume = function() {
-    // more stupid javascript nonsense to get the
-    // this to refer to the simulator
-    self = this;
     for (var i=0; i<this.population.length; i++) {
 	var cell = this.population[i];
 	cell.start_timers();

@@ -4,7 +4,16 @@ var plots = require("plots");
 
 global.sim = new Sim(Cell, "#chart");
 
-sim.popSize = function () { return 300; }
+sim.popSize = function () {
+    return d3.select("#population").attr("value");
+}
+
+d3.select("#population").on("change", function () {
+    var v = this.value;
+    sim.popSize = function () {
+	return v;
+    };
+});
 
 var update_count_plot = plots.setup_count_plot(sim);
 var update_benefit_plot = plots.setup_benefit_plot(sim);
@@ -12,15 +21,21 @@ var update_benefit_plot = plots.setup_benefit_plot(sim);
 d3.select("#start").on("click", function () {
     if (sim.running) {
 	sim.pause();
-	this.value = "resume";
+	d3.select(this).text("resume");
     } else {
         if (sim.population.length == 0) {
             sim.resetPopulation();
-	    setTimeout(update_benefit_plot, 1000, sim);
         }
 	sim.resume();
-	this.value = "pause";
+	d3.select(this).text("pause");
     }
+});
+
+d3.select("#reset").on("click", function () {
+    var wasrunning = sim.running;
+    if (wasrunning) sim.pause();
+    sim.resetPopulation();
+    if (wasrunning) sim.resume();
 });
 
 function exponential(rate) {
@@ -104,6 +119,7 @@ d3.select("#sigma").on("change", function () {
     this.value = sigma;
     d3.select("#sigmaLabel").text(sigma);
     Cell.prototype.sigma = function () { return sigma; };
+    update_benefit_plot(sim);
 });
 
 var charge = 250;
@@ -133,6 +149,19 @@ var start = new Date().getTime();
 sim.on("step", function () {
     var now = new Date().getTime();
     update_count_plot(this, now - start);
+    var stats = sim.population.map(function (c) { return c.stats(); });
+    var degree = d3.mean(sim.population.map(function (c) { 
+	return c.neighbours().length; 
+    }));
+    var neighbourhood = d3.mean(stats.map(function (s) { return s.neighbours; }));
+    var coop = d3.mean(stats.map(function (s) { return s.cooperators; }));
+    var cheat = d3.mean(stats.map(function (s) {
+	return s.neighbours - s.cooperators;
+    }));
+    d3.select("#counts_n").text(Math.round(degree*100)/100);
+    d3.select("#counts_nc").text(Math.round(coop*100)/100);
+    d3.select("#counts_nd").text(Math.round(cheat*100)/100);
+    d3.select("#counts_nh").text(Math.round(neighbourhood*100)/100);
 });
 
 //sim.start();

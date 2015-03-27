@@ -36,78 +36,98 @@
     <div class="container">
       <h1>Game-Theory Cell Evolution Demo</h1>
       <div class="row">
-	<div class="span4"></div>
-	<div class="span4" style="text-align: center;">
-	  <input type="submit" id="start" value="start" class="btn" />
-	  <input type="submit" id="reset" value="reset" class="btn" />
-	  <input type="text" id="population" value="300" size="4" />
-	</div>
-      </div>
-      <div class="row">
 	<div class="span3">
-	  <span>Division Rate</span>
-	  <label class="checkbox">
-	    <input id="division" type="range" min="0.01" max="1"
-		   step="0.01" />
-	    <span id="divisionLabel"></span>
-	  </label>
-	  <span>Death Rate:</span>
-	  <label class="checkbox">
-	    <input id="death" type="range" min="0.01", max="1"
-		   step="0.01" />
-	    <span id="deathLabel"></span>
-	  </label>
-	  <span>Production Rate:</span>
-	  <label class="checkbox">
-	    <input id="production" type="range" min="0.01" max="10"
-		   step="0.01" />
-	    <span id="productionLabel"></span>
-	  </label>
-	  <span>Mutation Probability:</span>
-	  <label class="checkbox">
-	    <input id="mutation" type="range" min="0.001" max="1"
-		   step="0.001" />
-	    <span id="mutationLabel"></span>
-	  </label>
-	  <span>Bias:</span>
-	  <label class="checkbox">
-	    <input id="bias" type="range" min="-1" max="1"
-		   step="0.01" />
-	    <span id="biasLabel"></span>
-	  </label>
-	  <span>Cost:</span>
-	  <label class="checkbox">
-	    <input id="cost" type="range" min="-10" max="10"
-		   step="1" />
-	    <span id="costLabel"></span>
-	  </label>
-	  <span>Sigma:</span>
-	  <label class="checkbox">
-	    <input id="sigma" type="range" min="-100" max="100"
-		   step="1" />
-	    <span id="sigmaLabel"></span>
-	  </label>
-	  <span>Charge:</span>
-	  <label class="checkbox">
-	    <input id="charge" type="range" min="1" max="1000"
-		   step="10" />
-	    <span id="chargeLabel"></span>
-	  </label>
-	  <span>Friction:</span>
-	  <label class="checkbox">
-	    <input id="friction" type="range" min="0" max="1"
-		   step="0.01" />
-	    <span id="frictionLabel"></span>
-	  </label>
+	  <div class="control-group">
+	    <div class="input-append">
+	      <input type="number" id="population" class="input-small"
+		     min="1" max="1000" value="300" />
+	      <button type="submit" id="start" class="btn btn-info">start</button>
+	      <button type="submit" id="reset" class="btn btn-info">reset</button>
+	    </div>
+	    <label class="control-label" for="division">
+	      <span>Division Rate</span>
+	    </label>
+	    <div class="controls">
+	      <input id="division" type="range" min="0.01" max="1"
+		     step="0.01" />
+	      <span id="divisionLabel"></span>
+	    </div>
+	    <label class="control-label" for="death">
+	      <span>Death Rate:</span>
+	    </label>
+	    <div class="controls">
+	      <input id="death" type="range" min="0.01", max="1"
+		     step="0.01" />
+	      <span id="deathLabel"></span>
+	    </div>
+	    <label class="control-label" for="production">
+	      <span>Production Rate:</span>
+	    </label>
+	    <div class="controls">
+	      <input id="production" type="range" min="0.01" max="10"
+		     step="0.01" />
+	      <span id="productionLabel"></span>
+	    </div>
+	    <label class="control-label" for="mutation">
+	      <span>Mutation Probability:</span>
+	    </label>
+	    <div class="controls">
+	      <input id="mutation" type="range" min="0.001" max="1"
+		     step="0.001" />
+	      <span id="mutationLabel"></span>
+	    </div>
+	    <label class="control-label" for="bias">
+	      <span>Bias:</span>
+	    </label>
+	    <div class="controls">
+	      <input id="bias" type="range" min="-1" max="1"
+		     step="0.01" />
+	      <span id="biasLabel"></span>
+	    </div>
+	    <label class="control-label" for="cost">
+	      <span>Cost:</span>
+	    </label>
+	    <div class="controls">
+	      <input id="cost" type="range" min="-10" max="10"
+		     step="1" />
+	      <span id="costLabel"></span>
+	    </div>
+	    <label class="control-label" for="sigma">
+	      <span>Sigma:</span>
+	    </label>
+	    <div class="controls">
+	      <input id="sigma" type="range" min="-100" max="100"
+		     step="1" />
+	      <span id="sigmaLabel"></span>
+	    </div>
+	    <label class="control-label" for="charge">
+	      <span>Charge:</span>
+	    </label>
+	    <div class="controls">
+	      <input id="charge" type="range" min="1" max="1000"
+		     step="10" />
+	      <span id="chargeLabel"></span>
+	    </div>
+	    <label class="control-label" for="friction">
+	      <span>Friction:</span>
+	    </label>
+	    <div class="controls">
+	      <input id="friction" type="range" min="0" max="1"
+		     step="0.01" />
+	      <span id="frictionLabel"></span>
+	    </div>
+	  </div>
 	</div>
 	<div class="span5" id="chart" style="text-align: center;"></div>
 	<div class="span4" id="plots">
 	  <h5 style="margin-left: 10px;">Cell count:
-	    <span id="counts_c"></span>/<span id="counts_d"></span>/<span id="counts_n"></span>
-	    <div id="counts"></div>
-	  <h5 style="margin-left: 10px;">Benefit</h5>
-	  <div id="benefit"></div>
+	    <span id="counts_c"></span>/<span id="counts_d"></span>/<span id="counts_t"></span>
 	  </h5>
+	  <h5 style="margin-left: 10px;">Neighbourhood:
+	    <span id="counts_n"></span>/<span id="counts_nc"></span>/<span id="counts_nd"></span>/<span id="counts_nh"></span>
+	  </h5>
+	  <div id="counts"></div>
+	  <div id="benefit"></div>
 	</div>
       </div>
     </div>
