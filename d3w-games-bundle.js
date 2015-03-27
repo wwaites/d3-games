@@ -10158,7 +10158,7 @@ function setup_fitness_plot(sim) {
 		return "translate(" + (xscale(d.x) - 1.5*dx) + "," + yscale(d.y) + ")";
 	    })
 	    .append("rect")
-	    .attr("x", 1)
+	    .attr("x", 0)
 	    .attr("width", dx)
 	    .attr("height", function(d) { return h - yscale(d.y); })
 	    .style("fill", sim.colours["coop"])
@@ -10172,7 +10172,7 @@ function setup_fitness_plot(sim) {
 		return "translate(" + (xscale(d.x) - 0.5*dx) + "," + yscale(d.y) + ")";
 	    })
 	    .append("rect")
-	    .attr("x", 1)
+	    .attr("x", 0)
 	    .attr("width", dx)
 	    .attr("height", function(d) { return h - yscale(d.y); })
 	    .style("fill", sim.colours["cheat"])
@@ -10186,7 +10186,7 @@ function setup_fitness_plot(sim) {
 		return "translate(" + (xscale(d.x) + 0.5*dx) + "," + yscale(d.y) + ")";
 	    })
 	    .append("rect")
-	    .attr("x", 1)
+	    .attr("x", 0)
 	    .attr("width", dx)
 	    .attr("height", function(d) { return h - yscale(d.y); })
 	    .style("fill", "steelblue")
