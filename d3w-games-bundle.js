@@ -268,11 +268,9 @@ Cell.prototype.benefit = function(stats) {
 Cell.prototype.payoff = function (stats) {
     if (stats == undefined) stats = this.stats();
     if (this.kind == "coop") {
-	return this.benefit(stats) * this.cost() * stats.cooperators/stats.neighbours 
-	    - 2*this.cost();
+	return this.benefit(stats) - this.cost();
     } else {
-	return this.benefit(stats) * this.cost() * stats.cooperators/stats.neighbours 
-	    - this.cost();
+	return this.benefit(stats);
     }
 }
 
@@ -10244,7 +10242,7 @@ Sim.prototype.divide = function(cell) {
     // add to the list of cells and redo the layout
     this.population.push(child);
     child.start_timers();
-    this.force.nodes(this.population).start()
+    this.force.nodes(this.population).start();
 }
 
 Sim.prototype.eat = function(cell, amount, path) {
@@ -10286,7 +10284,7 @@ Sim.prototype.eat = function(cell, amount, path) {
 
 Sim.prototype.die = function(cell) {
     this.population = this.population.filter(function (e) { return e.id != cell.id; });
-    this.force.nodes(this.population).start()
+    this.force.nodes(this.population).start();
 }
 
 Sim.prototype.w = function () { return 500; }
