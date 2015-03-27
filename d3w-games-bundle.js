@@ -269,9 +269,10 @@ Cell.prototype.payoff = function (stats) {
     if (stats == undefined) stats = this.stats();
     if (this.kind == "coop") {
 	return this.benefit(stats) * this.cost() * stats.cooperators/stats.neighbours 
-	    - this.cost();
+	    - 2*this.cost();
     } else {
-	return this.benefit(stats) * this.cost() * stats.cooperators/stats.neighbours;
+	return this.benefit(stats) * this.cost() * stats.cooperators/stats.neighbours 
+	    - this.cost();
     }
 }
 
