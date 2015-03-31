@@ -9927,8 +9927,8 @@ var Cell = require("cell");
 
 function setup_count_plot(sim) {
     var d3 = sim.d3;
-    var m = [0, 10, 25, 10];
-    var w = 250 - m[1] - m[3];
+    var m = [20, 20, 15, 60];
+    var w = 350 - m[1] - m[3];
     var h = 150 - m[0] - m[2];
     var xscale = d3.scale.linear().range([0, w]);
     var yscale = d3.scale.linear().range([h, 0]);
@@ -9942,6 +9942,15 @@ function setup_count_plot(sim) {
 	.attr("width", w + m[1] + m[3])
 	.attr("height", h + m[0] + m[2])
 	.append("svg:g");
+    plot.append("text")
+	.attr("transform", "translate(" + (w/2) + "," + (h+15) +")")
+	.attr("text-anchor", "middle")
+	.text("Time");
+    plot.append("text")
+	.attr("transform", "translate(" + (-40) + "," + (h/2) + ")" +
+	      "rotate(270)")
+	.attr("text-anchor", "middle")
+	.text("Cell Count");
 
     plot.attr("transform", "translate(" + m[3] + "," + m[0] + ")");
 
@@ -9951,6 +9960,11 @@ function setup_count_plot(sim) {
 	.style("fill", "none")
 	.attr("transform", "translate(0," + h + ")")
 	.call(xaxis);
+    var yaxis = d3.svg.axis().scale(yscale).ticks(2).orient("left");
+    var yaxisg = plot.append("g")
+    	.style("stroke", "#000")
+	.style("fill", "none")
+	.call(yaxis);
 
     var cheaters = plot.append("path")
 	.style("stroke", sim.colours["cheat"])
@@ -9996,6 +10010,11 @@ function setup_count_plot(sim) {
 	update_counts(sim, now);
 	xscale.domain([0, now]);
 	yscale.domain([0, d3.max(counts.map(function (c) { return c.total; }))]);
+
+	yaxis = yaxis.scale(yscale);
+	yaxisg = yaxisg.call(yaxis);
+
+	yaxisg.call(yscale);
 	cheaters.attr("d", line(counts.map(function (c) {
 	    return { x: c.time, y: c.cheat };
 	})));
@@ -10015,10 +10034,10 @@ function setup_count_plot(sim) {
 
 function setup_benefit_plot(sim) {
     var d3 = sim.d3;
-    var m = [0, 10, 25, 10];
-    var w = 250 - m[1] - m[3];
-    var h = 150 - m[0] - m[2];
-    var xscale = d3.scale.linear().domain([0, 50]).range([0, w]);
+    var m = [10, 20, 40, 60];
+    var w = 350 - m[1] - m[3];
+    var h = 140 - m[0] - m[2];
+    var xscale = d3.scale.linear().domain([0, 1]).range([0, w]);
     var yscale = d3.scale.linear().domain([0, 1]).range([h, 0]);
 
     var line = d3.svg.line()
@@ -10031,6 +10050,15 @@ function setup_benefit_plot(sim) {
 	.attr("width", w + m[1] + m[3])
 	.attr("height", h + m[0] + m[2])
 	.append("svg:g");
+    plot.append("text")
+	.attr("transform", "translate(" + (w/2) + "," + (h+35) +")")
+	.attr("text-anchor", "middle")
+	.text("Fraction of neighbourhood cooperative");
+    plot.append("text")
+	.attr("transform", "translate(-40," + (h/2) + ")" +
+	      "rotate(270)")
+	.attr("text-anchor", "middle")
+	.text("Benefit");
 
     plot.attr("transform", "translate(" + m[3] + "," + m[0] + ")");
 
@@ -10040,6 +10068,11 @@ function setup_benefit_plot(sim) {
 	.style("fill", "none")
 	.attr("transform", "translate(0," + h + ")")
 	.call(xaxis);
+    var yaxis = d3.svg.axis().scale(yscale).ticks(2).orient("left");
+    var yaxisg = plot.append("g")
+    	.style("stroke", "#000")
+	.style("fill", "none")
+	.call(yaxis);
 
     var benefit = plot.append("path")
 	.style("stroke", "steelblue")
@@ -10051,11 +10084,11 @@ function setup_benefit_plot(sim) {
     d3.select("#counts_nh").style("color", "steelblue");
 
     var update = function(sim) {
-	var data = d3.range(0, 50, 1).map(function (x) {
+	var data = d3.range(0, 1, 0.05).map(function (x) {
 	    return {
 		x: x,
 		y: Cell.prototype.benefit({
-		    neighbours: 50,
+		    neighbours: 1,
 		    cooperators: x
 		})
 	    }
@@ -10068,9 +10101,9 @@ function setup_benefit_plot(sim) {
 
 function setup_fitness_plot(sim) {
     var d3 = sim.d3;
-    var m = [0, 10, 25, 10];
-    var w = 250 - m[1] - m[3];
-    var h = 150 - m[0] - m[2];
+    var m = [10, 20, 40, 60];
+    var w = 350 - m[1] - m[3];
+    var h = 160 - m[0] - m[2];
 
     var xscale = d3.scale.linear().domain([0, 1]).range([0, w]);
     var yscale = d3.scale.linear().domain([0, 1]).range([h, 0]);
@@ -10083,13 +10116,27 @@ function setup_fitness_plot(sim) {
 	.append("g");
     plot.attr("transform", "translate(" + m[3] + "," + m[0] + ")");
 
-
     var xaxis = d3.svg.axis().scale(xscale).ticks(5);
     plot.append("g")
 	.style("stroke", "#000")
 	.style("fill", "none")
 	.attr("transform", "translate(0," + h + ")")
 	.call(xaxis);
+    var yaxis = d3.svg.axis().scale(yscale).ticks(2).orient("left");
+    var yaxisg = plot.append("g")
+    	.style("stroke", "#000")
+	.style("fill", "none")
+	.call(yaxis);
+
+    plot.append("text")
+	.attr("transform", "translate(" + (w/2) + "," + (h+35) +")")
+	.attr("text-anchor", "middle")
+	.text("Fitness");
+    plot.append("text")
+	.attr("transform", "translate(" + (-40) + "," + (h/2) + ")" +
+	      "rotate(270)")
+	.attr("text-anchor", "middle")
+	.text("Cell count");
 
     function update(sim) {
 	var fits = sim.population.map(function (c) {
@@ -10109,6 +10156,8 @@ function setup_fitness_plot(sim) {
 	var cheat_data = d3.layout.histogram().bins(20).range([0, max_fit])(cheat_fits);
 	
 	yscale = yscale.domain([0, sim.population.length]);
+	yaxis = yaxis.scale(yscale);
+	yaxisg = yaxisg.call(yaxis);
 
 	var dx = xscale(d3.max(all_data, function(d) { return d.dx/3; }));
 
